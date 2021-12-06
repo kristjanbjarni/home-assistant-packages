@@ -3,7 +3,9 @@ Here are some of my custom [Home Assistant] packages for displaying Icelandic we
 
 <!---<a href="https://www.buymeacoffee.com/kristjanbjarni" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 -->
-<a href="https://paypal.me/kristjanbjarni" target="_blank"><img src="https://www.paypalobjects.com/digitalassets/c/website/logo/full-text/pp_fc_hl.svg" alt="paypal.me" height="41" width="174"></a>
+If you want to support me, you can donate to me with [PayPal]:
+
+<a href="https://paypal.me/kristjanbjarni" target="_blank"><img src="https://kristjanbjarni.github.io/kristjanbjarni/img/Paypal_logo_PNG5.png" alt="paypal.me" height="42"></a>
 
 ## Requirements
 Working setup of [Home Assistant]
@@ -89,3 +91,4 @@ weather:
 [Veðurstöðvar]: https://www.vedur.is/vedur/stodvar
 [Gagnaveita Vegagerðarinnar]: http://www.vegagerdin.is/upplysingar-og-utgafa/gagnaveita-vegagerdarinnar
 [Gagnaveita]: http://gagnaveita.vegagerdin.is/api/vedur2014_1
+[PayPal]: https://paypal.me/kristjanbjarni
