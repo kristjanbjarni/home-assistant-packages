@@ -1,8 +1,6 @@
-# Home Assistant Packages
+# Home Assistant Weather Packages
 Here are some of my custom [Home Assistant] packages for displaying Icelandic weather information from local Icelandic sources.
 
-<!---<a href="https://www.buymeacoffee.com/kristjanbjarni" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
--->
 If you want to support me, you can donate to me with [PayPal].
 
 ## Requirements
