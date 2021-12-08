@@ -58,7 +58,7 @@ Weather information from belgingur.is. The weather card is named `weather.belgin
 ## <a name="vegagerdin"></a>Vegagerðin (vegagerdin.yaml)
 ![vegagerdin](docs/vegagerdin.png)
 
-Weather information from vegagerdin.is. The weather card is named `weather.vegagerðin`. This card used 
+Weather information from vegagerdin.is. The weather card is named `weather.vegagerdin`. This card used 
 [Gagnaveita Vegagerðarinnar] to retrieve weather information. This only includes current temperature and other measurements but no description or weather forecast. The data updates every 10 minutes.
 
 ### Customizing weather station to use for vegagerðin
