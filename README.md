@@ -1,4 +1,4 @@
-# Home Assistant Weather Packages
+# Home Assistant Icelandic weather card packages
 Here are some of my custom [Home Assistant] packages for displaying Icelandic weather information from local Icelandic sources.
 
 If you want to support me, you can donate to me with [PayPal].
@@ -24,7 +24,7 @@ homeassistant:
     belgingur: !include packages/belgingur.yaml
 ```
 
-## Available weather packages
+## Available weather cards
 - [Veður.is](#vedur) (vedur_is.yaml)
 - [Belgingur](#belgingur) (belgingur.yaml)
 - [Vegagerðin](#vegagerdin) (vegagerdin.yaml)
@@ -38,7 +38,7 @@ Weather information from vedur.is. The weather card is named `weather.vedur_is`.
 Default weather station is Reykjavík with id=1. You can find out other ids by checking [Veðurstöðvar]. Click on `Upplýsingar` and find out the `Stöðvanúmer`. You can then go to `Developer tools` and find the entity `input_number.vedurstod` and change the state to the selected id number or simply add this entity to a dashboard and modify the station id directly there.
 
 ### Display text weather description in a markdown card.
-You can display vedur.is weather description for the capital Reykjavik and the whole country in a markdown card by adding a mark down card and specifying this content:
+You can display vedur.is weather description for the capital Reykjavik and the whole country in a markdown card by adding a mark down card and specifying for example this content:
 
 ```markdown
 **{{ state_attr('sensor.vedur_text_capital','friendly_name') }}**
@@ -53,7 +53,7 @@ You can display vedur.is weather description for the capital Reykjavik and the w
 ## <a name="belgingur"></a>Belgingur (belgingur.yaml)
 ![belgingur](docs/belgingur.png)
 
-Weather information from belgingur.is. The weather card is named `weather.belgingur`. Just add this as any other normal weather card. The card uses your current Home position for weather location as specified in General configuration. The information is updated every 10 minutes.
+Weather forecast information from belgingur.is. The weather card is named `weather.belgingur`. Just add this as any other normal weather card. The card uses your current Home position for weather location as specified in General configuration. The information is updated every 10 minutes.
 
 ## <a name="vegagerdin"></a>Vegagerðin (vegagerdin.yaml)
 ![vegagerdin](docs/vegagerdin.png)
