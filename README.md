@@ -1,4 +1,4 @@
-# Home Assistant Icelandic weather card packages
+# Home Assistant Icelandic weather cards
 Here are some of my custom [Home Assistant] packages for displaying Icelandic weather information from local Icelandic sources.
 
 If you want to support me, you can donate to me with [PayPal].
@@ -23,11 +23,13 @@ homeassistant:
     vegagerdin: !include packages/vegagerdin.yaml
     belgingur: !include packages/belgingur.yaml
 ```
+Then restart Home Assistant.
+
 
 ## Available weather cards
-- [Veður.is](#vedur) (vedur_is.yaml)
-- [Belgingur](#belgingur) (belgingur.yaml)
-- [Vegagerðin](#vegagerdin) (vegagerdin.yaml)
+- [Veður.is](#vedur)
+- [Belgingur](#belgingur)
+- [Vegagerðin](#vegagerdin)
 
 ## <a name="vedur"></a>Veður.is (vedur_is.yaml)
 ![vedur_is](docs/vedur_is.png)
@@ -65,7 +67,7 @@ Weather information from vegagerdin.is. The weather card is named `weather.vegag
 Default weather station is `Reykjavík`. You can find out other names by checking [Gagnaveita] and finding your station `Nafn` in the list. You can then go to `Developer tools` and find the entity `input_text.vegagerdin_vedurstod` and change the value or simply add this entity to a dashboard and modify the station name directly there.
 
 ## Custom weather card
-You can either use the included weather cards directly as is or create your own custom weather card using information from different sources, by adding something like this in your `configuration.yaml`
+You can either use the included weather cards directly as is or create your own custom weather card using information from different sources, by adding something like this in your `configuration.yaml` wich integrates from all the different sources.
 
 ```yaml
 weather:
@@ -74,8 +76,8 @@ weather:
     attribution_template: "Veður.is/Vegagerðin/Belgingur"
     condition_template: "{{ states('sensor.belgingur_condition') }}"
     temperature_template: "{{ states('sensor.vegagerdin_temperature') }}"
-    humidity_template: "{{ states('sensor.vedur_humidity')}}"
-    pressure_template: "{{ states('sensor.vedur_pressure')}}"
+    humidity_template: "{{ states('sensor.vedur_humidity') }}"
+    pressure_template: "{{ states('sensor.vedur_pressure') }}"
     wind_speed_template: "{{ states('sensor.belgingur_wind_speed') }}"
     wind_bearing_template: "{{ states('sensor.belgingur_wind_bearing') }}"
     visibility_template: "{{ states('sensor.vedur_visibility') }}"
