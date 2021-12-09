@@ -25,7 +25,6 @@ homeassistant:
 ```
 Then restart Home Assistant.
 
-
 ## Available weather cards
 - [Veður.is](#vedur)
 - [Belgingur](#belgingur)
@@ -67,7 +66,7 @@ Weather information from vegagerdin.is. The weather card is named `weather.vegag
 Default weather station is `Reykjavík`. You can find out other names by checking [Gagnaveita] and finding your station `Nafn` in the list. You can then go to `Developer tools` and find the entity `input_text.vegagerdin_vedurstod` and change the value or simply add this entity to a dashboard and modify the station name directly there.
 
 ## Custom weather card
-You can either use the included weather cards directly as is or create your own custom weather card using information from different sources, by adding something like this in your `configuration.yaml` wich integrates from all the different sources.
+You can either use the included weather cards directly as is or create your own custom weather card using information from different sources, by adding something like this in your `configuration.yaml` which integrates sensors from all the different sources.
 
 ```yaml
 weather:
