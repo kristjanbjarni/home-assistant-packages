@@ -1,0 +1,177 @@
+# Weather card for belgingur.is (2021-12-09)
+# Author: Kristján Bjarni Guðmundsson
+# https://github.com/kristjanbjarni/home-assistant-packages
+
+sensor belgingur condition lookup:
+  platform: template
+  sensors:
+    belgingur_condition_lookup:
+      value_template: "OK"
+      attribute_templates:
+        condition: >
+          {% set vedur_condition = {'Fair':'sunny',
+                                'Partly cloudy':'partlycloudy',
+                                'Snow showers':'snowy',
+                                'Snow':'snowy',
+                                'Sleet showers':'snowy-rainy',
+                                'Light sleet showers':'snowy-rainy',
+                                'Light snow showers':'snowy',
+                                'Light sleet':'snowy-rainy',
+                                'Cloudy':'cloudy',
+                                'Clear sky':'sunny',
+                                'Rain showers':'pouring',
+                                'Light rain showers':'rainy',
+                                'Light rain':'rainy',
+                                'Rain':'rainy',
+                                'Sleet':'snowy-rainy',
+                                'Light snow':'snowy'
+                               } %}
+          {{ vedur_condition }}
+
+sensor belgingur source:
+  platform: rest    
+  name: belgingur_source
+  resource_template: >
+                 {% set lat = state_attr('zone.home','latitude') %}
+                 {% set lon = state_attr('zone.home','longitude') %}
+                 https://wod-odinn.belgingur.is/api/v2/data/point/schedule/island-8-2/2/latlon/{{lat}},{{lon}}/meteogram.xml
+  json_attributes_path: "$.weatherdata.forecast.tabular"
+  json_attributes:
+    - time
+  value_template: "{{value_json.weatherdata.location.ref}}"
+  scan_interval: 600
+
+sensor belgingur sensors:
+  platform: template
+  sensors:
+    belgingur_current:
+      value_template: "OK"
+      attribute_templates:
+        time: >
+          {% set n = now().timestamp() %}
+          {% set current = namespace(time=none, break=false) %}
+          {% set times = state_attr('sensor.belgingur_source','time') %}
+          {% for t in times if not current.break %}
+            {% set from = as_timestamp(strptime(t['@from'],'%Y-%m-%dT%H:%M:%S')) %}
+            {% set to = as_timestamp(strptime(t['@to'],'%Y-%m-%dT%H:%M:%S')) %}
+            {% if n>=from and n<to %}
+              {% set current.time = t %}
+              {% set current.break = true %}
+            {% endif %}            
+          {% endfor %}
+          {% if current.time is none %}
+            {% set current.time = times[0] %}
+          {% endif %}
+          {{ current.time }}
+    belgingur_temperature:
+      friendly_name: "Hitastig"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').temperature['@value'] | float(default=0) }}"
+      device_class: temperature
+      unit_of_measurement: "°C"
+    belgingur_wind_speed:
+      friendly_name: "Vindhraði"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').windSpeed['@mps'] | float(default=0) * 3.6 }}"
+      unit_of_measurement: "m/s"
+      icon_template: "mdi:weather-windy"
+    belgingur_wind_bearing:
+      friendly_name: "Vindátt"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').windDirection['@code'] }}"
+      icon_template: "mdi:windsock"
+    belgingur_condition_org:
+      friendly_name: "Veðurlýsing (Original)"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').symbol['@name'] }}"
+      icon_template: "mdi:weather-cloudy"
+    belgingur_condition:
+      friendly_name: "Veðurlýsing"
+      value_template: >
+        {% set cond = states('sensor.belgingur_condition_org') %}
+        {{ state_attr('sensor.belgingur_condition_lookup','condition').get(cond) }}
+      icon_template: "mdi:weather-cloudy"
+    belgingur_humidity:
+      friendly_name: "Rakastig"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').humidity['@value'] | float(default=0) }}"
+      device_class: temperature
+      unit_of_measurement: "%"
+    belgingur_pressure:
+      friendly_name: "Loftþrýstingur"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').pressure['@value'] | float(default=0)  }}"
+      device_class: pressure
+      unit_of_measurement: "hPa"
+    belgingur_forecast:
+      friendly_name: "Veðurspá"
+      value_template: "OK"
+      icon_template: "mdi:weather-cloudy"
+      attribute_templates:
+        forecast: >
+          {% set forecasts = namespace(items=[]) %}
+          {% set work = namespace(date=none,time=none,temp=none,templow=none,wind=none,cond=none) %}
+          {% for f in state_attr('sensor.belgingur_source','time') %}
+            {% set cur_date = f['@from'][0:10] %}
+            {% set cur_time = f['@from'][11:13] %}
+            {% set cur_temp = float(f.temperature['@value']) %}
+            {% set cur_cond = f.symbol['@name'] %}
+            {% set cur_wind = float(f.windSpeed['@mps']) * 3.6 %}
+            {%if work.date is none %}
+              {% set work.date = cur_date %}
+              {% set work.time = cur_time %}
+              {% set work.temp = cur_temp %}
+              {% set work.templow = cur_temp %}
+              {% set work.cond = cur_cond %}
+              {% set work.wind = cur_wind %}
+            {% endif %}
+            {% if cur_date == work.date %}
+              {% if cur_temp < work.templow %}
+                {% set work.templow = cur_temp %}
+              {% endif %}
+              {% if cur_temp > work.temp %}
+                {% set work.temp = cur_temp %}
+              {% endif %}
+              {% if cur_time == '12' %}
+                {% set work.time = cur_time %}
+                {% set work.cond = cur_cond %}
+                {% set work.wind = cur_wind %}
+              {% endif %}
+            {% else %}
+                {% set cond = none %}
+                {% if state_attr('sensor.belgingur_condition_lookup','condition') %}
+                  {% set cond = state_attr('sensor.belgingur_condition_lookup','condition').get(work.cond) %}
+                {% endif %}
+                {% set data = {'datetime': work.date+'T'+work.time+':00:00Z', 
+                             'condition': cond,
+                             'temperature': work.temp,
+                             'wind_speed': work.wind,
+                             'templow': work.templow } %}
+              {% set forecasts.items = forecasts.items + [data] %}
+              {% set work.date = cur_date %}
+              {% set work.time = cur_time %}
+              {% set work.temp = cur_temp %}
+              {% set work.templow = cur_temp %}
+              {% set work.cond = cur_cond %}
+              {% set work.wind = cur_wind %}
+            {% endif %}
+          {% endfor %}
+          {% if work.date is not none %}
+            {% set cond = none %}
+            {% if state_attr('sensor.belgingur_condition_lookup','condition') %}
+              {% set cond = state_attr('sensor.belgingur_condition_lookup','condition').get(work.cond) %}
+            {% endif %}
+            {% set data = {'datetime': work.date+'T'+work.time+':00:00Z', 
+                           'condition': cond,
+                           'temperature': work.temp,
+                           'wind_speed': work.wind,
+                           'templow': work.templow } %}
+            {% set forecasts.items = forecasts.items + [data] %}
+          {% endif %}
+          {{ forecasts.items }}
+
+weather:
+  - platform: template
+    name: "Belgingur"
+    attribution_template: "Gögn frá Belgingur.is"
+    condition_template: "{{ states('sensor.belgingur_condition') }}"
+    temperature_template: "{{ states('sensor.belgingur_temperature') }}"
+    humidity_template: "{{ states('sensor.belgingur_humidity') }}"
+    pressure_template: "{{ states('sensor.belgingur_pressure') }}"
+    wind_speed_template: "{{ states('sensor.belgingur_wind_speed') }}"
+    wind_bearing_template: "{{ states('sensor.belgingur_wind_bearing') }}"
+    forecast_template: "{{ state_attr('sensor.belgingur_forecast','forecast') }}"

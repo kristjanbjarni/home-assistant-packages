@@ -1,0 +1,81 @@
+# Weather card for vegagerdin.is (2021-12-09)
+# Author: Kristján Bjarni Guðmundsson
+# https://github.com/kristjanbjarni/home-assistant-packages
+
+input_text:
+  vegagerdin_vedurstod:
+    name: Vegagerðin - Veðurstöð
+    icon: mdi:weather-cloudy
+
+sensor vegagerdin vedurstod:
+  platform: template
+  sensors:
+    vegagerdin_vedurstod:
+      friendly_name: "Veðurstöð"
+      value_template: >
+        {% set v = states('input_text.vegagerdin_vedurstod') %}
+        {% if v!="unknown" %}
+          {{ v }}
+        {% else %} 
+          Reykjavík
+        {% endif %}
+      icon_template: "mdi:weather-windy"
+  
+sensor vegagerdin source:
+  platform: rest
+  name: vegagerdin_source
+  resource: http://gagnaveita.vegagerdin.is/api/vedur2014_1
+  headers:
+    Accept: application/xml
+  json_attributes_path: "$.ArrayOfVedur"
+  json_attributes:
+    - Vedur
+  value_template: "OK"
+  scan_interval: 600
+  
+sensor vegagerdin vedurstod current:
+  platform: template
+  sensors:
+    vegagerdin_current:
+      value_template: "{{ states('sensor.vegagerdin_vedurstod') }}"
+      attribute_templates:
+        vedurstod: "{{ state_attr('sensor.vegagerdin_source','Vedur') | selectattr('Nafn','equalto',states('sensor.vegagerdin_vedurstod')) | first }}"
+
+sensor vegagerdin sensors:
+  platform: template
+  sensors:
+    vegagerdin_temperature:
+      friendly_name: "Hitastig"
+      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').Hiti | float(default=0) }}"
+      device_class: temperature
+      unit_of_measurement: "°C"
+    vegagerdin_wind_speed:
+      friendly_name: "Vindhraði"
+      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').Vindhradi | float(default=0) * 3.6  }}"
+      unit_of_measurement: "m/s"
+      icon_template: "mdi:weather-windy"
+    vegagerdin_wind_bearing:
+      friendly_name: "Vindátt"
+      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').VindattAsc }}"
+      icon_template: "mdi:windsock"
+    vegagerdin_humidity:
+      friendly_name: "Rakastig"
+      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').Raki | float(default=0) }}"
+      device_class: temperature
+      unit_of_measurement: "%"
+    vegagerdin_pressure:
+      friendly_name: "Loftþrýstingur"
+      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').Loftthrystingur | float(default=0)  }}"
+      device_class: pressure
+      unit_of_measurement: "hPa"
+
+weather:
+  - platform: template
+    name: "Vegagerðin"
+    attribution_template: "Byggt á gögnum frá Vegagerðinni"
+    condition_template: "{{ none }}"
+    temperature_template: "{{ states('sensor.vegagerdin_temperature') }}"
+    humidity_template: "{{ states('sensor.vegagerdin_humidity')}}"
+    pressure_template: "{{ states('sensor.vegagerdin_pressure')}}"
+    wind_speed_template: "{{ states('sensor.vegagerdin_wind_speed') }}"
+    wind_bearing_template: "{{ states('sensor.vegagerdin_wind_bearing') }}"
