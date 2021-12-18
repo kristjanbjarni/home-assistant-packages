@@ -1,5 +1,5 @@
 # Home Assistant Icelandic weather cards
-Here are some of my custom [Home Assistant] packages for displaying Icelandic weather information from local Icelandic sources.
+Packages for [Home Assistant] with Icelandic weather providers from local Icelandic sources.
 
 ## Requirements
 Working setup of [Home Assistant] and access to [configuration.yaml]
