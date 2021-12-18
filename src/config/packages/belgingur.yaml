@@ -1,4 +1,4 @@
-# Weather card for belgingur.is (2021-12-09)
+# Weather card for belgingur.is (2021-12-18)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -10,21 +10,22 @@ sensor belgingur condition lookup:
       attribute_templates:
         condition: >
           {% set vedur_condition = {'Fair':'sunny',
-                                'Partly cloudy':'partlycloudy',
-                                'Snow showers':'snowy',
-                                'Snow':'snowy',
-                                'Sleet showers':'snowy-rainy',
-                                'Light sleet showers':'snowy-rainy',
-                                'Light snow showers':'snowy',
-                                'Light sleet':'snowy-rainy',
-                                'Cloudy':'cloudy',
                                 'Clear sky':'sunny',
-                                'Rain showers':'pouring',
-                                'Light rain showers':'rainy',
+                                'Cloudy':'cloudy',
+                                'Heavy rain showers':'pouring',
                                 'Light rain':'rainy',
+                                'Light rain showers':'rainy',
+                                'Light sleet':'snowy-rainy',
+                                'Light sleet showers':'snowy-rainy',
+                                'Light snow':'snowy', 
+                                'Light snow showers':'snowy',
+                                'Partly cloudy':'partlycloudy',
                                 'Rain':'rainy',
+                                'Rain showers':'pouring',
                                 'Sleet':'snowy-rainy',
-                                'Light snow':'snowy'
+                                'Sleet showers':'snowy-rainy',
+                                'Snow':'snowy',
+                                'Snow showers':'snowy'
                                } %}
           {{ vedur_condition }}
 
@@ -75,7 +76,7 @@ sensor belgingur sensors:
       icon_template: "mdi:weather-windy"
     belgingur_wind_bearing:
       friendly_name: "Vindátt"
-      value_template: "{{ state_attr('sensor.belgingur_current','time').windDirection['@code'] }}"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').windDirection['@code'] | default('') }}"
       icon_template: "mdi:windsock"
     belgingur_condition_org:
       friendly_name: "Veðurlýsing (Original)"
