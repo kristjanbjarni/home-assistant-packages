@@ -1,4 +1,4 @@
-# Weather card for vedur.is (2021-12-09)
+# Weather card for vedur.is (2021-12-18)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -15,7 +15,7 @@ input_number:
     icon: mdi:weather-cloudy
 
 automation:
-  - alias: 'Veður: Textaspá skyndiminni'
+  - alias: 'Veður: Veðurspá/Textaspá/Norðurljós skyndiminni'
     trigger:
     - platform: time_pattern
       hours: /1
@@ -24,6 +24,14 @@ automation:
       data:
         url: https://xmlweather.vedur.is/?op_w=xml&type=txt&lang=is&view=xml&ids=3;6
         output: /config/www/vedur_is/texts.xml
+    - service: shell_command.vedur_curl
+      data:
+        url: https://xmlweather.vedur.is/?op_w=xml&type=forec&lang=is&view=xml&ids={{ states('input_number.vedurstod') | int }}
+        output: /config/www/vedur_is/forecasts.xml
+    - service: shell_command.vedur_curl
+      data:
+        url: https://xmlweather.vedur.is/aurora?op=xml&type=index
+        output: /config/www/vedur_is/aurora.xml
   - alias: 'Veður: Veðurathuganir skyndiminni'
     trigger:
     - platform: time_pattern
@@ -33,15 +41,6 @@ automation:
       data:
         url: https://xmlweather.vedur.is/?op_w=xml&view=xml&type=obs&ids={{ states('input_number.vedurstod') | int }}&lang=is&params=T;F;D;W;V;RH;P
         output: /config/www/vedur_is/observations.xml
-  - alias: 'Veður: Veðurspá skyndiminni'
-    trigger:
-    - platform: time_pattern
-      hours: /1
-    action:
-    - service: shell_command.vedur_curl
-      data:
-        url: https://xmlweather.vedur.is/?op_w=xml&type=forec&lang=is&view=xml&ids={{ states('input_number.vedurstod') | int }}
-        output: /config/www/vedur_is/forecasts.xml
 
 sensor vedur condition lookup:
   platform: template
@@ -75,6 +74,12 @@ sensor vedur condition lookup:
                                 'Moldrok':'windy'
                                } %}
           {{ vedur_condition }}
+    vedur_aurora_lookup:
+      value_template: "OK"
+      attribute_templates:
+        condition: >
+          {% set list = ['Lágmarksvirkni','Mjög lítil virkni','Lítil virkni','Dálítil virkni','Talsverð virkni','Allmikil virkni','Mikil virkni','Öflug virkni','Mjög öflug virkni','Hámarksvirkni'] %}
+          {{ list }}          
 
 sensor vedur:
   platform: rest
@@ -102,9 +107,19 @@ sensor vedur forecast source:
   value_template: "{{value_json.forecasts.station.name}}"
   scan_interval: 300
   
-sensor vedur text:
+sensor vedur aurora source:
   platform: rest
-  name: vedur_text
+  name: vedur_aurora_source
+  resource: http://localhost:8123/local/vedur_is/aurora.xml
+  json_attributes_path: "$.aurora"
+  json_attributes:
+    - night_data
+  value_template: "OK"
+  scan_interval: 300  
+  
+sensor vedur text source:
+  platform: rest
+  name: vedur_text_source
   resource: http://localhost:8123/local/vedur_is/texts.xml
   json_attributes_path: "$.texts"
   json_attributes:
@@ -207,7 +222,7 @@ sensor vedur sensors:
         {% if state_attr('sensor.vedur','T') %}
           {{ state_attr('sensor.vedur','T' ) | replace(',','.') | float(default=0) }}
         {% else %}
-          {{ state_attr('sensor.vedur_forecast','current').temperature }}
+          {{ state_attr('sensor.vedur_forecast','current').temperature | float(default=0) }}
         {% endif %}
       device_class: temperature
       unit_of_measurement: "°C"
@@ -217,7 +232,7 @@ sensor vedur sensors:
         {% if state_attr('sensor.vedur','F') %}
           {{ state_attr('sensor.vedur','F') | replace(',','.') | float(default=0) * 3.6 }}
         {% else %}
-          {{ state_attr('sensor.vedur_forecast','current').wind_speed }}
+          {{ state_attr('sensor.vedur_forecast','current').wind_speed | float(default=0) }}
         {% endif %}
       unit_of_measurement: "m/s"
       icon_template: "mdi:weather-windy"
@@ -227,7 +242,7 @@ sensor vedur sensors:
         {% if state_attr('sensor.vedur','D') %}
           {{ state_attr('sensor.vedur','D' ) }}
         {% else %}
-          {{ state_attr('sensor.vedur_forecast','current').wind_bearing }}
+          {{ state_attr('sensor.vedur_forecast','current').wind_bearing | default('') }}
         {% endif %}
       icon_template: "mdi:windsock"
     vedur_condition_org:
@@ -260,12 +275,11 @@ sensor vedur sensors:
       device_class: pressure
       unit_of_measurement: "hPa"
     vedur_text_capital:
-      friendly_name: "Veðurhorfur á höfuðborgarsvæðinu"
-      value_template: "OK"
+      value_template: "Veðurhorfur á höfuðborgarsvæðinu"
       icon_template: "mdi:weather-cloudy"
       attribute_templates:
         text: >
-          {% set node = state_attr('sensor.vedur_text','text') | selectattr('@id','equalto','3') | first %}
+          {% set node = state_attr('sensor.vedur_text_source','text') | selectattr('@id','equalto','3') | first %}
           {% if node is not none %}
             {% set text = node.content %}
             {% if text["#text"] == null %}
@@ -275,12 +289,11 @@ sensor vedur sensors:
             {% endif %}
           {% endif %}
     vedur_text_country:
-      friendly_name: "Veðurhorfur á landinu næstu daga"
-      value_template: "OK"
+      value_template: "Veðurhorfur á landinu næstu daga"
       icon_template: "mdi:weather-cloudy"
       attribute_templates:
         text: >
-          {% set node = state_attr('sensor.vedur_text','text') | selectattr('@id','equalto','6') | first %}
+          {% set node = state_attr('sensor.vedur_text_source','text') | selectattr('@id','equalto','6') | first %}
           {% if node is not none %}
             {% set text = node.content %}
             {% if text["#text"] == null %}
@@ -289,6 +302,46 @@ sensor vedur sensors:
               {{ text["#text"] }}
             {% endif %}
           {% endif %}
+    vedur_aurora:
+      friendly_name: "Norðurljós"
+      icon_template: >
+        {% set data = state_attr('sensor.vedur_aurora_source','night_data') %}
+        {% if data %}
+          {% set n = data[0].activity_forecast | int(default=0) %}
+          {% if n > 5 %}
+            mdi:weather-night
+          {% elif n > 2 %}
+            mdi:weather-night-partly-cloudy
+          {% else %}
+            mdi:weather-cloudy
+          {% endif %}
+        {% else %}
+          mdi:weather-cloudy
+        {% endif %}
+      value_template: >
+          {% set condition = state_attr('sensor.vedur_aurora_lookup','condition') %}
+          {% set data = state_attr('sensor.vedur_aurora_source','night_data') %}
+          {% if data %}
+            {% set n = data[0].activity_forecast | int(default=0) %}
+            {{ condition[n] }} ({{ n }})
+          {% else %}
+            none
+          {% endif %}
+      attribute_templates:
+        forecast: >
+          {%- set condition = state_attr('sensor.vedur_aurora_lookup','condition') %}
+          |Dags|Spá|
+          
+          |:---|:---|
+          
+          {%- for data in state_attr('sensor.vedur_aurora_source','night_data') %}
+            {%- set date = strptime(data.evening_date,'%Y-%m-%d') %}
+            {%- set d = date.strftime('%a. %d. %b') %}
+            {%- set n = data.activity_forecast | int %}
+            {%- set c = condition[n] %}
+          |{{d}}|{{c}} ({{n}})|
+            
+          {%- endfor %}
 
 weather:
   - platform: template
