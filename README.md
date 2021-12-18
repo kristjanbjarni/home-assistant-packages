@@ -1,8 +1,6 @@
 # Home Assistant Icelandic weather cards
 Here are some of my custom [Home Assistant] packages for displaying Icelandic weather information from local Icelandic sources.
 
-If you want to support me, you can donate to me with [PayPal].
-
 ## Requirements
 Working setup of [Home Assistant] and access to [configuration.yaml]
 
@@ -42,13 +40,21 @@ Default weather station is Reykjavík with id=1. You can find out other ids by c
 You can display vedur.is weather description for the capital Reykjavik and the whole country in a markdown card by adding a mark down card and specifying for example this content:
 
 ```markdown
-**{{ state_attr('sensor.vedur_text_capital','friendly_name') }}**
+**<ha-icon icon="mdi:weather-cloudy"></ha-icon> {{ states('sensor.vedur_text_capital') }}** 
 {{ state_attr('sensor.vedur_text_capital','text') }}
 
-**{{ state_attr('sensor.vedur_text_country','friendly_name') }}**
+**<ha-icon icon="mdi:weather-cloudy"></ha-icon> {{ states('sensor.vedur_text_country') }}**  
 {{ state_attr('sensor.vedur_text_country','text') }}
 
 [Veðurspá](https://www.vedur.is/vedur/spar/thattaspar/hofudborgarsvaedid/#teg=urkoma)
+```
+![foreceast_text](docs/vedur_is_forecast_text.png)
+
+### Display aurora forecast.
+Aurora forecast for next evening is available in entity `sensor.vedur_aurora`, there is also aurora forecast for next days displayed as a text table. This can be displayed in markdown card with:
+
+```markdown
+{{ state_attr('sensor.vedur_aurora','forecast') }}
 ```
 
 ## <a name="belgingur"></a>Belgingur (belgingur.yaml)
@@ -73,7 +79,7 @@ weather:
   - platform: template
     name: "My custom weather"
     attribution_template: "Veður.is/Vegagerðin/Belgingur"
-    condition_template: "{{ states('sensor.belgingur_condition') }}"
+    condition_template: "{{ states('sensor.vedur_condition') }}"
     temperature_template: "{{ states('sensor.vegagerdin_temperature') }}"
     humidity_template: "{{ states('sensor.vedur_humidity') }}"
     pressure_template: "{{ states('sensor.vedur_pressure') }}"
