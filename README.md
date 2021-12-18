@@ -34,7 +34,7 @@ Then restart Home Assistant.
 Weather information from vedur.is. The weather card is named `weather.vedur_is`. Just add this as any other normal weather card. The integration calls XML services as specified in [Gagnaveita - XML þjónusta] every 10 minutes for temperature data and every hour for forecast data. The XML data is cached locally in folder /config/www/vedur_is.
 
 ### Customizing what weather station to use for vedur.is
-Default weather station is Reykjavík with id=1. You can find out other ids by checking [Veðurstöðvar]. Click on `Upplýsingar` and find out the `Stöðvanúmer`. You can then go to `Developer tools` and find the entity `input_number.vedurstod` and change the state to the selected id number or simply add this entity to a dashboard and modify the station id directly there.
+Default weather station is Reykjavík with id=1. You can find out other ids by checking [Veðurstöðvar]. Click on `Upplýsingar` and find out the `Stöðvanúmer`. You can then go to `Developer tools` and find the entity `input_number.vedur_vedurstod` and change the state to the selected id number or simply add this entity to a dashboard and modify the station id directly there.
 
 ### Display text weather description in a markdown card.
 You can display vedur.is weather description for the capital Reykjavik and the whole country in a markdown card by adding a mark down card and specifying for example this content:
@@ -51,7 +51,7 @@ You can display vedur.is weather description for the capital Reykjavik and the w
 ![foreceast_text](docs/vedur_is_forecast_text.png)
 
 ### Display aurora forecast.
-Aurora forecast for next evening is available in entity `sensor.vedur_aurora`, there is also aurora forecast for next days displayed as a text table. This can be displayed in markdown card with:
+Aurora forecast for next evening is available in entity `sensor.vedur_aurora`, there is also aurora forecast for the next days displayed as a table. This can be displayed in markdown card with:
 
 ```markdown
 {{ state_attr('sensor.vedur_aurora','forecast') }}
@@ -60,7 +60,7 @@ Aurora forecast for next evening is available in entity `sensor.vedur_aurora`, t
 ## <a name="belgingur"></a>Belgingur (belgingur.yaml)
 ![belgingur](docs/belgingur.png)
 
-Weather forecast information from belgingur.is. The weather card is named `weather.belgingur`. Just add this as any other normal weather card. The card uses your current Home position for weather location as specified in General configuration. The information is updated every 10 minutes.
+Weather forecast information from [belgingur.is]. The weather card is named `weather.belgingur`. Just add this as any other normal weather card. The card uses your current Home position for weather location as specified in General configuration. The information is updated every 10 minutes.
 
 ## <a name="vegagerdin"></a>Vegagerðin (vegagerdin.yaml)
 ![vegagerdin](docs/vegagerdin.png)
@@ -92,6 +92,7 @@ weather:
 [Home Assistant]: https://www.home-assistant.io
 [Gagnaveita - XML þjónusta]: https://www.vedur.is/um-vi/vefurinn/xml
 [Veðurstöðvar]: https://www.vedur.is/vedur/stodvar
+[belgingur.is]: https://belgingur.is
 [Gagnaveita Vegagerðarinnar]: http://www.vegagerdin.is/upplysingar-og-utgafa/gagnaveita-vegagerdarinnar
 [Gagnaveita]: http://gagnaveita.vegagerdin.is/api/vedur2014_1
 [PayPal]: https://paypal.me/kristjanbjarni
