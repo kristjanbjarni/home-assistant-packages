@@ -39,7 +39,7 @@ automation:
     action:
     - service: shell_command.vedur_curl
       data:
-        url: https://xmlweather.vedur.is/?op_w=xml&view=xml&type=obs&ids={{ states('input_number.vedurstod') | int }}&lang=is&params=T;F;D;W;V;RH;P
+        url: https://xmlweather.vedur.is/?op_w=xml&view=xml&type=obs&ids={{ states('input_number.vedur_vedurstod') | int }}&lang=is&params=T;F;D;W;V;RH;P
         output: /config/www/vedur_is/observations.xml
 
 sensor vedur condition lookup:
