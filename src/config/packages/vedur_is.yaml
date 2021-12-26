@@ -1,4 +1,4 @@
-# Weather card for vedur.is (2021-12-18)
+# Weather card for vedur.is (2021-12-26)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -322,8 +322,12 @@ sensor vedur sensors:
           {% set condition = state_attr('sensor.vedur_aurora_lookup','condition') %}
           {% set data = state_attr('sensor.vedur_aurora_source','night_data') %}
           {% if data %}
-            {% set n = data[0].activity_forecast | int(default=0) %}
-            {{ condition[n] }} ({{ n }})
+            {% if data[0].activity_forecast %}              
+              {% set n = data[0].activity_forecast| int(default=0) %}
+              {{ condition[n] }} ({{ n }})
+            {% else %}
+              none
+            {% endif %}
           {% else %}
             none
           {% endif %}
