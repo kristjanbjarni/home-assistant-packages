@@ -1,4 +1,4 @@
-# Weather card for vedur.is (2021-12-26)
+# Weather card for vedur.is (2021-12-28)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -144,7 +144,7 @@ sensor vedur forecast:
               {% set data = {'datetime': f.ftime, 
                              'condition': f.W,
                              'temperature': float(f.T),
-                             'wind_speed': float(f.F) * 3.6
+                             'wind_speed': float(f.F)
                             } %}
               {% set work.data=data %}
               {% set work.break = true %}
@@ -159,7 +159,7 @@ sensor vedur forecast:
             {% set cur_time = f.ftime[11:13] %}
             {% set cur_temp = float(f.T) %}
             {% set cur_cond = f.W %}
-            {% set cur_wind = float(f.F) * 3.6 %}
+            {% set cur_wind = float(f.F) %}
             {%if work.date is none %}
               {% set work.date = cur_date %}
               {% set work.time = cur_time %}
@@ -230,7 +230,7 @@ sensor vedur sensors:
       friendly_name: "Vindhraði"
       value_template: >
         {% if state_attr('sensor.vedur','F') %}
-          {{ state_attr('sensor.vedur','F') | replace(',','.') | float(default=0) * 3.6 }}
+          {{ state_attr('sensor.vedur','F') | replace(',','.') | float(default=0) }}
         {% else %}
           {{ state_attr('sensor.vedur_forecast','current').wind_speed | float(default=0) }}
         {% endif %}
