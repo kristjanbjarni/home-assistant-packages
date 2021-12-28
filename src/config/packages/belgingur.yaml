@@ -1,4 +1,4 @@
-# Weather card for belgingur.is (2021-12-18)
+# Weather card for belgingur.is (2021-12-28)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -71,7 +71,7 @@ sensor belgingur sensors:
       unit_of_measurement: "°C"
     belgingur_wind_speed:
       friendly_name: "Vindhraði"
-      value_template: "{{ state_attr('sensor.belgingur_current','time').windSpeed['@mps'] | float(default=0) * 3.6 }}"
+      value_template: "{{ state_attr('sensor.belgingur_current','time').windSpeed['@mps'] | float(default=0) }}"
       unit_of_measurement: "m/s"
       icon_template: "mdi:weather-windy"
     belgingur_wind_bearing:
@@ -111,7 +111,7 @@ sensor belgingur sensors:
             {% set cur_time = f['@from'][11:13] %}
             {% set cur_temp = float(f.temperature['@value']) %}
             {% set cur_cond = f.symbol['@name'] %}
-            {% set cur_wind = float(f.windSpeed['@mps']) * 3.6 %}
+            {% set cur_wind = float(f.windSpeed['@mps']) %}
             {%if work.date is none %}
               {% set work.date = cur_date %}
               {% set work.time = cur_time %}
