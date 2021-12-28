@@ -1,4 +1,4 @@
-# Weather card for vegagerdin.is (2021-12-18)
+# Weather card for vegagerdin.is (2021-12-28)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -51,7 +51,7 @@ sensor vegagerdin sensors:
       unit_of_measurement: "°C"
     vegagerdin_wind_speed:
       friendly_name: "Vindhraði"
-      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').Vindhradi | float(default=0) * 3.6  }}"
+      value_template: "{{ state_attr('sensor.vegagerdin_current','vedurstod').Vindhradi | float(default=0)  }}"
       unit_of_measurement: "m/s"
       icon_template: "mdi:weather-windy"
     vegagerdin_wind_bearing:
