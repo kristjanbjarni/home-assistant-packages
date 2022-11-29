@@ -48,10 +48,53 @@ You can display vedur.is weather description for the capital Reykjavik and the w
 
 [Veðurspá](https://www.vedur.is/vedur/spar/thattaspar/hofudborgarsvaedid/#teg=urkoma)
 ```
-![foreceast_text](docs/vedur_is_forecast_text.png)
 
 ### Display aurora forecast.
-Aurora forecast for next evening is available in entity `sensor.vedur_aurora`, there is also aurora forecast for the next days displayed as a table. This can be displayed in markdown card with:
+Aurora forecast for next evening is available in entity `sensor.vedur_aurora` as a value from 0..9 for aurora activity and as a text value in entity `sensor.vedur_aurora_text`. Do display the aurora value as a gauge like this:
+
+![aurora_gauge](docs/aurora_gauge.png)
+
+You can use this yaml code:
+```yaml
+type: gauge
+entity: sensor.vedur_aurora
+max: 9
+min: 0
+needle: true
+segments:
+  - from: 0
+    color: DodgerBlue
+    label: Lágmarksvirkni
+  - from: 1
+    color: DodgerBlue
+    label: Mjög lítil virkni
+  - from: 2
+    color: SeaGreen
+    label: Lítil virkni
+  - from: 3
+    color: SeaGreen
+    label: Dálítil virkni
+  - from: 4
+    color: Orange
+    label: Talsverð virkni
+  - from: 5
+    color: Orange
+    label: Allmikil virkni
+  - from: 6
+    color: Crimson
+    label: Mikil virkni
+  - from: 7
+    color: Crimson
+    label: Öflug virkni
+  - from: 8
+    color: DarkRed
+    label: Mjög öflug virkni
+  - from: 9
+    color: DarkRed
+    label: Hámarksvirkni
+```
+
+There is also aurora forecast for the next days displayed as a table. This can be displayed in markdown card with:
 
 ```markdown
 {{ state_attr('sensor.vedur_aurora','forecast') }}
