@@ -50,7 +50,7 @@ You can display vedur.is weather description for the capital Reykjavik and the w
 ```
 
 ### Display aurora forecast.
-Aurora forecast for next evening is available in entity `sensor.vedur_aurora` as a value from 0..9 for aurora activity and as a text value in entity `sensor.vedur_aurora_text`. Do display the aurora value as a gauge like this:
+Aurora forecast for next evening is available in entity `sensor.vedur_aurora` as a value from 0..9 for aurora activity and as a text value in entity `sensor.vedur_aurora_text`. To display the aurora value as a gauge like this:
 
 ![aurora_gauge](docs/aurora_gauge.png)
 
@@ -58,8 +58,8 @@ You can use this yaml code:
 ```yaml
 type: gauge
 entity: sensor.vedur_aurora
-max: 9
 min: 0
+max: 9
 needle: true
 segments:
   - from: 0
