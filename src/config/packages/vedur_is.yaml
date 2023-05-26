@@ -1,4 +1,4 @@
-# Weather card for vedur.is (2022-11-29)
+# Weather card for vedur.is (2023-05-26)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -79,7 +79,7 @@ sensor vedur condition lookup:
       attribute_templates:
         condition: >
           {% set list = ['Lágmarksvirkni','Mjög lítil virkni','Lítil virkni','Dálítil virkni','Talsverð virkni','Allmikil virkni','Mikil virkni','Öflug virkni','Mjög öflug virkni','Hámarksvirkni'] %}
-          {{ list }}          
+          {{ list }}
 
 sensor vedur:
   platform: rest
@@ -267,7 +267,7 @@ sensor vedur sensors:
     vedur_humidity:
       friendly_name: "Rakastig"
       value_template: "{{ state_attr('sensor.vedur','RH') | replace(',','.') | float(0) }}"
-      device_class: temperature
+      device_class: humidity
       unit_of_measurement: "%"
     vedur_pressure:
       friendly_name: "Loftþrýstingur"
@@ -367,12 +367,17 @@ sensor vedur sensors:
 weather:
   - platform: template
     name: "Veður.is"
+    unique_id: weather.vedur_is
     attribution_template: "Gögn frá Veður.is"
     condition_template: "{{ states('sensor.vedur_condition') }}"
     temperature_template: "{{ states('sensor.vedur_temperature') | float(0) }}"
+    temperature_unit: "°C"
     humidity_template: "{{ states('sensor.vedur_humidity') | float(0) }}"
     pressure_template: "{{ states('sensor.vedur_pressure') | float(0) }}"
+    pressure_unit: "hPa"
     wind_speed_template: "{{ states('sensor.vedur_wind_speed') | float(0) }}"
+    wind_speed_unit: "m/s"
     wind_bearing_template: "{{ states('sensor.vedur_wind_bearing') }}"
     visibility_template: "{{ states('sensor.vedur_visibility') | float(0) }}"
+    visibility_unit: "km"
     forecast_template: "{{ state_attr('sensor.vedur_forecast','forecast') }}"
