@@ -1,4 +1,4 @@
-# Weather card for vedur.is (2023-05-26)
+# Weather card for vedur.is (2023-10-23)
 # Author: Kristján Bjarni Guðmundsson
 # https://github.com/kristjanbjarni/home-assistant-packages
 
@@ -14,11 +14,10 @@ input_number:
     mode: box
     icon: mdi:weather-cloudy
 
-automation:
-  - alias: 'Veður: Veðurspá/Textaspá/Norðurljós skyndiminni'
-    trigger:
-    - platform: time_pattern
-      hours: /1
+template:
+  - trigger:
+      - platform: time_pattern
+        hours: /1
     action:
     - service: shell_command.vedur_curl
       data:
@@ -32,10 +31,9 @@ automation:
       data:
         url: https://xmlweather.vedur.is/aurora?op=xml&type=index
         output: /config/www/vedur_is/aurora.xml
-  - alias: 'Veður: Veðurathuganir skyndiminni'
-    trigger:
-    - platform: time_pattern
-      minutes: /10
+  - trigger:
+      - platform: time_pattern
+        minutes: /10
     action:
     - service: shell_command.vedur_curl
       data:
@@ -106,7 +104,7 @@ sensor vedur forecast source:
     - forecast
   value_template: "{{value_json.forecasts.station.name}}"
   scan_interval: 300
-  
+
 sensor vedur aurora source:
   platform: rest
   name: vedur_aurora_source
@@ -115,8 +113,8 @@ sensor vedur aurora source:
   json_attributes:
     - night_data
   value_template: "OK"
-  scan_interval: 300  
-  
+  scan_interval: 300
+
 sensor vedur text source:
   platform: rest
   name: vedur_text_source
@@ -126,7 +124,7 @@ sensor vedur text source:
     - text
   value_template: "{{value_json.texts.text[0].title}}"
   scan_interval: 300
-  
+
 sensor vedur forecast:
   platform: template
   sensors:
@@ -151,7 +149,26 @@ sensor vedur forecast:
             {% endif %}
           {% endfor %}
           {{ work.data }}
-        forecast: >
+        forecast_hourly: >
+          {% set forecasts = namespace(items=[]) %}
+          {% for f in state_attr('sensor.vedur_forecast_source','forecast') %}
+            {% set cur_date = f.ftime[0:10] %}
+            {% set cur_time = f.ftime[11:13] %}
+            {% set cur_temp = float(f.T) %}
+            {% set cur_cond = f.W %}
+            {% set cur_wind = float(f.F) %}
+            {% set cond = none %}
+            {% if state_attr('sensor.vedur_condition_lookup','condition') %}
+              {% set cond = state_attr('sensor.vedur_condition_lookup','condition').get(cur_cond) %}
+            {% endif %}
+            {% set data = {'datetime': cur_date+'T'+cur_time+':00:00Z', 
+                         'condition': cond,
+                         'temperature': cur_temp,
+                         'wind_speed': cur_wind } %}
+          {% set forecasts.items = forecasts.items + [data] %}
+          {% endfor %}
+          {{ forecasts.items }}
+        forecast_daily: >
           {% set forecasts = namespace(items=[]) %}
           {% set work = namespace(date=none,time=none,temp=none,templow=none,wind=none,cond=none) %}
           {% for f in state_attr('sensor.vedur_forecast_source','forecast') %}
@@ -250,7 +267,7 @@ sensor vedur sensors:
       value_template: >
         {% if state_attr('sensor.vedur','W') %}
           {{ state_attr('sensor.vedur','W') }}
-        {% else %}          
+        {% else %}
           {{ state_attr('sensor.vedur_forecast','current').condition }}
         {% endif %}
       icon_template: "mdi:weather-cloudy"
@@ -321,7 +338,7 @@ sensor vedur sensors:
               mdi:weather-night-partly-cloudy
             {% else %}
               mdi:weather-cloudy
-            {% endif %}            
+            {% endif %}
           {% else %}
             mdi:weather-cloudy
           {% endif %}
@@ -337,7 +354,7 @@ sensor vedur sensors:
             {{ condition[n] }}
           {% else %}
             none
-          {% endif %}          
+          {% endif %}
         forecast: >
           {%- set condition = state_attr('sensor.vedur_aurora_lookup','condition') %}
           |Dags|Spá|
@@ -380,4 +397,5 @@ weather:
     wind_bearing_template: "{{ states('sensor.vedur_wind_bearing') }}"
     visibility_template: "{{ states('sensor.vedur_visibility') | float(0) }}"
     visibility_unit: "km"
-    forecast_template: "{{ state_attr('sensor.vedur_forecast','forecast') }}"
+    forecast_daily_template: "{{ state_attr('sensor.vedur_forecast','forecast_daily') }}"
+    forecast_hourly_template: "{{ state_attr('sensor.vedur_forecast','forecast_hourly') }}"
