@@ -118,18 +118,21 @@ Default weather station is `Reykjavík`. You can find out other names by checkin
 You can either use the included weather cards directly as is or create your own custom weather card using information from different sources, by adding something like this in your `configuration.yaml` which integrates sensors from all the different sources.
 
 ```yaml
-weather:
-  - platform: template
-    name: "My custom weather"
-    attribution_template: "Veður.is/Vegagerðin/Belgingur"
-    condition_template: "{{ states('sensor.vedur_condition') }}"
-    temperature_template: "{{ states('sensor.vegagerdin_temperature') }}"
-    humidity_template: "{{ states('sensor.vedur_humidity') }}"
-    pressure_template: "{{ states('sensor.vedur_pressure') }}"
-    wind_speed_template: "{{ states('sensor.belgingur_wind_speed') }}"
-    wind_bearing_template: "{{ states('sensor.belgingur_wind_bearing') }}"
-    visibility_template: "{{ states('sensor.vedur_visibility') }}"
-    forecast_template: "{{ state_attr('sensor.vedur_forecast','forecast') }}"
+template:
+  - weather:
+    - default_entity_id: weather.my_custom_weather
+      name: "My custom weather"
+      attribution_template: "Veður.is/Vegagerðin/Belgingur"
+      condition_template: "{{ states('sensor.vedur_condition') }}"
+      temperature_template: "{{ states('sensor.vegagerdin_temperature') }}"
+      humidity_template: "{{ states('sensor.vedur_humidity') }}"
+      pressure_template: "{{ states('sensor.vedur_pressure') }}"
+      wind_speed_template: "{{ states('sensor.belgingur_wind_speed') }}"
+      wind_bearing_template: "{{ states('sensor.belgingur_wind_bearing') }}"
+      visibility_unit: km
+      visibility_template: "{{ states('sensor.vedur_visibility') }}"
+      forecast_daily_template: "{{ state_attr('sensor.vedur_forecast','forecast_daily') }}"
+      forecast_hourly_template: "{{ state_attr('sensor.vedur_forecast','forecast_hourly') }}"
 ```
 
 [Home Assistant]: https://www.home-assistant.io
